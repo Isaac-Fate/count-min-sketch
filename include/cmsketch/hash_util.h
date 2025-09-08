@@ -1,10 +1,7 @@
 
 #pragma once
 
-#include <algorithm>
 #include <cstdlib>
-#include <iostream>
-#include <string>
 
 namespace cmsketch {
 

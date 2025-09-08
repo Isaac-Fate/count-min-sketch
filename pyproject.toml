@@ -19,5 +19,6 @@ build-backend = "scikit_build_core.build"
 
 [dependency-groups]
 dev = [
+    "faker>=37.6.0",
     "ipykernel>=6.30.1",
 ]

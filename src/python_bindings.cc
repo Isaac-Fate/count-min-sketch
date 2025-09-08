@@ -22,10 +22,7 @@ namespace py = pybind11;
       .def("get_width", &cmsketch::CountMinSketch<class_type>::GetWidth,       \
            "Get the width of the sketch")                                      \
       .def("get_depth", &cmsketch::CountMinSketch<class_type>::GetDepth,       \
-           "Get the depth of the sketch")                                      \
-      .def("get_total_count",                                                  \
-           &cmsketch::CountMinSketch<class_type>::GetTotalCount,               \
-           "Get the total number of elements inserted")
+           "Get the depth of the sketch")
 
 PYBIND11_MODULE(_core, m) {
   m.doc() = "Count-Min Sketch implementation with Python bindings";
@@ -33,6 +30,6 @@ PYBIND11_MODULE(_core, m) {
   // CountMinSketch class for strings
   DEFINE_COUNT_MIN_SKETCH_METHODS(std::string, "CountMinSketchStr");
 
-  // CountMinSketch class for integers
+  // CountMinSketch class for int
   DEFINE_COUNT_MIN_SKETCH_METHODS(int, "CountMinSketchInt");
 }

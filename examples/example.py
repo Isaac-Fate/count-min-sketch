@@ -11,7 +11,7 @@ def main():
     print(f"Version: {cmsketch.__version__}")
 
     # Create a sketch with width=1000, depth=5
-    sketch = cmsketch.CountMinSketch(1000, 5)
+    sketch = cmsketch.PyCountMinSketch(1000, 5)
 
     # Add some elements
     elements = [
@@ -48,12 +48,11 @@ def main():
     for item, count in top_k:
         print(f"{item}: {count}")
 
-    print(f"\nTotal elements: {sketch.get_total_count()}")
     print(f"Sketch dimensions: {sketch.get_width()} x {sketch.get_depth()}")
 
     # Test with integer keys
     print("\n--- Testing with integer keys ---")
-    int_sketch = cmsketch.CountMinSketchInt(100, 3)
+    int_sketch = cmsketch.PyCountMinSketchInt(100, 3)
 
     int_elements = [1, 2, 1, 3, 2, 1, 4, 5]
     for element in int_elements:
@@ -63,8 +62,6 @@ def main():
     for i in range(1, 6):
         count = int_sketch.count(i)
         print(f"{i}: {count}")
-
-    print(f"Total integer elements: {int_sketch.get_total_count()}")
 
 
 if __name__ == "__main__":

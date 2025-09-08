@@ -1,4 +1,5 @@
 #include "cmsketch/count_min_sketch.h"
+#include <algorithm>
 #include <cstddef>
 #include <format>
 #include <stdexcept>
@@ -15,8 +16,7 @@ namespace cmsketch {
  */
 template <typename KeyType>
 CountMinSketch<KeyType>::CountMinSketch(uint32_t width, uint32_t depth)
-    : width_(width), depth_(depth), total_count_(0) {
-  /** @TODO(student) Implement this function! */
+    : width_(width), depth_(depth) {
 
   // Throw an error if width or depth are zero
   if (width == 0 || depth == 0) {
@@ -29,7 +29,6 @@ CountMinSketch<KeyType>::CountMinSketch(uint32_t width, uint32_t depth)
   sketch_matrix_ =
       std::make_unique<std::vector<std::atomic<uint32_t>>>(width_ * depth_);
 
-  /** @fall2025 PLEASE DO NOT MODIFY THE FOLLOWING */
   // Initialize seeded hash functions
   hash_functions_.reserve(depth_);
   for (size_t i = 0; i < depth_; i++) {
@@ -39,9 +38,7 @@ CountMinSketch<KeyType>::CountMinSketch(uint32_t width, uint32_t depth)
 
 template <typename KeyType>
 CountMinSketch<KeyType>::CountMinSketch(CountMinSketch &&other) noexcept
-    : width_(other.width_), depth_(other.depth_),
-      total_count_(other.total_count_.load()) {
-  /** @TODO(student) Implement this function! */
+    : width_(other.width_), depth_(other.depth_) {
 
   // Do nothing if the other sketch is the same
   if (this == &other) {
@@ -56,7 +53,6 @@ CountMinSketch<KeyType>::CountMinSketch(CountMinSketch &&other) noexcept
 template <typename KeyType>
 auto CountMinSketch<KeyType>::operator=(CountMinSketch &&other) noexcept
     -> CountMinSketch & {
-  /** @TODO(student) Implement this function! */
 
   // Do nothing if the other sketch is the same
   if (this == &other) {
@@ -66,7 +62,6 @@ auto CountMinSketch<KeyType>::operator=(CountMinSketch &&other) noexcept
   // Set the width and depth
   width_ = other.width_;
   depth_ = other.depth_;
-  total_count_ = other.total_count_.load();
 
   // Move the table and hash functions
   sketch_matrix_ = std::move(other.sketch_matrix_);
@@ -77,7 +72,6 @@ auto CountMinSketch<KeyType>::operator=(CountMinSketch &&other) noexcept
 
 template <typename KeyType>
 void CountMinSketch<KeyType>::Insert(const KeyType &item) {
-  /** @TODO(student) Implement this function! */
 
   for (size_t i = 0; i < depth_; i++) {
     // Get the hash function
@@ -89,9 +83,6 @@ void CountMinSketch<KeyType>::Insert(const KeyType &item) {
     // Increment the count in the table
     sketch_matrix_->at(i * width_ + column_index).fetch_add(1);
   }
-
-  // Increment total count
-  total_count_.fetch_add(1);
 }
 
 template <typename KeyType>
@@ -109,9 +100,6 @@ void CountMinSketch<KeyType>::Merge(const CountMinSketch<KeyType> &other) {
     // Increment the count in the current sketch
     sketch_matrix_->at(i).fetch_add(count);
   }
-
-  // Add the total count from the other sketch
-  total_count_.fetch_add(other.total_count_.load());
 }
 
 template <typename KeyType>
@@ -144,9 +132,6 @@ template <typename KeyType> void CountMinSketch<KeyType>::Clear() {
 
   // Zero out the sketch matrix
   std::fill(sketch_matrix_->begin(), sketch_matrix_->end(), 0);
-
-  // Reset total count
-  total_count_.store(0);
 }
 
 template <typename KeyType>

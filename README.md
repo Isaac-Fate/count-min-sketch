@@ -171,7 +171,6 @@ for item, count in top_k:
 - `Merge(other)`: Merge another sketch
 - `Clear()`: Reset sketch to initial state
 - `TopK(k, candidates)`: Get top k items from candidates
-- `GetTotalCount()`: Get total elements inserted
 - `GetWidth()`: Get sketch width
 - `GetDepth()`: Get sketch depth
 

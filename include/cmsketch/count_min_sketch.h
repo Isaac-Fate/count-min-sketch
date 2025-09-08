@@ -28,6 +28,18 @@ public:
       -> CountMinSketch &; // Move assignment
 
   /**
+   * @brief Get the width of the sketch
+   * @return Width of the sketch
+   */
+  auto GetWidth() const -> uint32_t { return width_; }
+
+  /**
+   * @brief Get the depth of the sketch
+   * @return Depth of the sketch
+   */
+  auto GetDepth() const -> uint32_t { return depth_; }
+
+  /**
    * @brief Inserts an item into the count-min sketch
    *
    * @param item The item to increment the count for
@@ -70,24 +82,6 @@ public:
   auto TopK(uint16_t k, const std::vector<KeyType> &candidates)
       -> std::vector<std::pair<KeyType, uint32_t>>;
 
-  /**
-   * @brief Get the width of the sketch
-   * @return Width of the sketch
-   */
-  auto GetWidth() const -> uint32_t { return width_; }
-
-  /**
-   * @brief Get the depth of the sketch
-   * @return Depth of the sketch
-   */
-  auto GetDepth() const -> uint32_t { return depth_; }
-
-  /**
-   * @brief Get the total number of elements inserted
-   * @return Total count of all elements
-   */
-  auto GetTotalCount() const -> uint64_t { return total_count_; }
-
 private:
   /** Dimensions of the count-min sketch matrix */
   uint32_t width_; // Number of buckets for each hash function
@@ -118,9 +112,6 @@ private:
 
   // A vector representing the sketch matrix
   std::unique_ptr<std::vector<std::atomic<uint32_t>>> sketch_matrix_;
-
-  // Total count of elements inserted
-  std::atomic<uint64_t> total_count_;
 };
 
 } // namespace cmsketch

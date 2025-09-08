@@ -20,7 +20,6 @@ TEST_F(CountMinSketchTest, BasicInsertAndCount) {
   sketch->Insert("test");
   sketch->Insert("test");
   EXPECT_EQ(sketch->Count("test"), 5);
-  EXPECT_EQ(sketch->GetTotalCount(), 5);
 }
 
 TEST_F(CountMinSketchTest, MultipleElements) {
@@ -40,7 +39,6 @@ TEST_F(CountMinSketchTest, MultipleElements) {
   EXPECT_EQ(sketch->Count("a"), 3);
   EXPECT_EQ(sketch->Count("b"), 7);
   EXPECT_EQ(sketch->Count("c"), 2);
-  EXPECT_EQ(sketch->GetTotalCount(), 12);
 }
 
 TEST_F(CountMinSketchTest, DuplicateInserts) {
@@ -51,7 +49,6 @@ TEST_F(CountMinSketchTest, DuplicateInserts) {
   sketch->Insert("test");
 
   EXPECT_EQ(sketch->Count("test"), 5);
-  EXPECT_EQ(sketch->GetTotalCount(), 5);
 }
 
 TEST_F(CountMinSketchTest, NonExistentElement) {
@@ -72,7 +69,6 @@ TEST_F(CountMinSketchTest, Clear) {
   sketch->Clear();
 
   EXPECT_EQ(sketch->Count("test"), 0);
-  EXPECT_EQ(sketch->GetTotalCount(), 0);
 }
 
 TEST_F(CountMinSketchTest, Merge) {
@@ -95,7 +91,6 @@ TEST_F(CountMinSketchTest, Merge) {
   EXPECT_EQ(sketch->Count("a"), 4);
   EXPECT_EQ(sketch->Count("b"), 2);
   EXPECT_EQ(sketch->Count("c"), 4);
-  EXPECT_EQ(sketch->GetTotalCount(), 10);
 }
 
 TEST_F(CountMinSketchTest, MergeIncompatibleDimensions) {
@@ -178,5 +173,4 @@ TEST_F(CountMinSketchTest, IntegerKeys) {
   EXPECT_EQ(int_sketch.Count(1), 2);
   EXPECT_EQ(int_sketch.Count(2), 4);
   EXPECT_EQ(int_sketch.Count(3), 0);
-  EXPECT_EQ(int_sketch.GetTotalCount(), 6);
 }

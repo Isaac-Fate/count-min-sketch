@@ -56,3 +56,6 @@ bak/
 
 # Playground
 playground/
+
+# Large data files
+data/

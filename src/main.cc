@@ -36,7 +36,6 @@ int main() {
     std::cout << pair.first << ": " << pair.second << std::endl;
   }
 
-  std::cout << "\nTotal elements: " << sketch.GetTotalCount() << std::endl;
   std::cout << "Sketch dimensions: " << sketch.GetWidth() << " x "
             << sketch.GetDepth() << std::endl;
 

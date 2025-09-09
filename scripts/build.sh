@@ -11,6 +11,7 @@ mkdir -p build
 cd build
 
 # Configure with CMake
+# For development/IDE support, add -DDEVELOPMENT_MODE=ON
 cmake .. \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_TESTS=ON \
@@ -18,7 +19,7 @@ cmake .. \
     -DBUILD_PYTHON_BINDINGS=ON
 
 # Build the project
-make -j"$(nproc)"
+make -j"$(sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4)"
 
 echo "Build completed successfully!"
 

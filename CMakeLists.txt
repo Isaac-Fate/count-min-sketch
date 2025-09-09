@@ -10,6 +10,10 @@ project(
 # Generate compile_commands.json for better IDE support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Development mode - ensures dependencies are found for IDE support
+option(DEVELOPMENT_MODE "Enable development mode with IDE dependency support"
+       OFF)
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -39,7 +43,7 @@ else()
 endif()
 
 # Auto-detect source files
-file(GLOB_RECURSE CMSKETCH_SOURCES "src/cmsketch/*.cc" "src/cmsketch/*.cpp")
+file(GLOB_RECURSE CMSKETCH_SOURCES "src/cpp/*.cc" "src/cpp/*.cpp")
 
 # Auto-detect header files
 file(GLOB_RECURSE CMSKETCH_HEADERS "include/cmsketch/*.h"
@@ -91,9 +95,16 @@ install(
   NAMESPACE cmsketch::
   DESTINATION lib/cmake/cmsketch)
 
-# Find pybind11 for IDE support (always try to find it)
-set(PYBIND11_FINDPYTHON ON)
-find_package(pybind11 CONFIG)
+# Find pybind11 for Python bindings and IDE support
+if(DEVELOPMENT_MODE
+   OR BUILD_PYTHON_BINDINGS
+   OR SKBUILD_PROJECT_NAME)
+  set(PYBIND11_FINDPYTHON ON)
+  find_package(pybind11 CONFIG QUIET)
+  if(NOT pybind11_FOUND)
+    find_package(pybind11 QUIET)
+  endif()
+endif()
 
 # Python bindings (only if building with scikit-build)
 if(SKBUILD_PROJECT_NAME AND pybind11_FOUND)
@@ -105,10 +116,9 @@ if(SKBUILD_PROJECT_NAME AND pybind11_FOUND)
   install(TARGETS _core DESTINATION ${SKBUILD_PROJECT_NAME})
 endif()
 
-# Optional Python bindings target for development/IDE support
+# Python bindings for development/IDE support
 option(BUILD_PYTHON_BINDINGS "Build Python bindings for development" OFF)
-if(BUILD_PYTHON_BINDINGS AND pybind11_FOUND)
-  # Auto-detect Python bindings source
+if((BUILD_PYTHON_BINDINGS OR DEVELOPMENT_MODE) AND pybind11_FOUND)
   file(GLOB PYTHON_BINDINGS_SOURCES "src/python_bindings.cc"
        "src/python_bindings.cpp")
   pybind11_add_module(_core_dev MODULE ${PYTHON_BINDINGS_SOURCES})
@@ -116,11 +126,19 @@ if(BUILD_PYTHON_BINDINGS AND pybind11_FOUND)
   set_target_properties(_core_dev PROPERTIES OUTPUT_NAME "_core")
 endif()
 
-# Testing (only if enabled)
+# Testing - find GTest for IDE support in development mode
 option(BUILD_TESTS "Build tests" OFF)
-if(BUILD_TESTS)
-  enable_testing()
-  add_subdirectory(tests)
+if(DEVELOPMENT_MODE OR BUILD_TESTS)
+  find_package(GTest QUIET)
+  if(GTest_FOUND)
+    enable_testing()
+    add_subdirectory(tests)
+  elseif(DEVELOPMENT_MODE)
+    message(
+      WARNING
+        "DEVELOPMENT_MODE enabled but GTest not found. Install GTest for test file IDE support."
+    )
+  endif()
 endif()
 
 # Documentation (only if enabled)
@@ -148,5 +166,30 @@ add_custom_target(
 # Print configuration summary
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
+message(STATUS "Development mode: ${DEVELOPMENT_MODE}")
+message(STATUS "Build tests: ${BUILD_TESTS}")
+message(STATUS "Build Python bindings: ${BUILD_PYTHON_BINDINGS}")
+message(STATUS "pybind11 found: ${pybind11_FOUND}")
+if(GTest_FOUND)
+  message(STATUS "GTest found: ${GTest_FOUND}")
+endif()
 message(STATUS "Source files: ${CMSKETCH_SOURCES}")
 message(STATUS "Header files: ${CMSKETCH_HEADERS}")
+
+# Development mode info
+if(DEVELOPMENT_MODE)
+  message(STATUS "")
+  message(
+    STATUS "Development mode enabled - dependencies found for IDE support:")
+  if(pybind11_FOUND)
+    message(STATUS "  ✓ pybind11 - Python bindings headers available")
+  else()
+    message(STATUS "  ✗ pybind11 - Install with: pip install pybind11")
+  endif()
+  if(GTest_FOUND)
+    message(STATUS "  ✓ GTest - Test headers available")
+  else()
+    message(
+      STATUS "  ✗ GTest - Install via package manager for test file support")
+  endif()
+endif()

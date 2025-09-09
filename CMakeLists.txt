@@ -43,7 +43,8 @@ else()
 endif()
 
 # Auto-detect source files
-file(GLOB_RECURSE CMSKETCH_SOURCES "src/cpp/*.cc" "src/cpp/*.cpp")
+file(GLOB_RECURSE CMSKETCH_SOURCES "src/cmsketchcpp/*.cc"
+     "src/cmsketchcpp/*.cpp")
 
 # Auto-detect header files
 file(GLOB_RECURSE CMSKETCH_HEADERS "include/cmsketch/*.h"

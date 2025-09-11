@@ -1,5 +1,6 @@
 #include "cmsketch/count_min_sketch.h"
 #include <algorithm>
+#include <climits>
 #include <cstddef>
 #include <sstream>
 #include <stdexcept>
@@ -21,8 +22,8 @@ CountMinSketch<KeyType>::CountMinSketch(uint32_t width, uint32_t depth)
   // Throw an error if width or depth are zero
   if (width == 0 || depth == 0) {
     std::ostringstream oss;
-    oss << "Width and depth must be greater than zero; Got width: " 
-        << width << ", depth: " << depth;
+    oss << "Width and depth must be greater than zero; Got width: " << width
+        << ", depth: " << depth;
     throw std::invalid_argument(oss.str());
   }
 
@@ -104,7 +105,7 @@ void CountMinSketch<KeyType>::Merge(const CountMinSketch<KeyType> &other) {
 template <typename KeyType>
 auto CountMinSketch<KeyType>::Count(const KeyType &item) const -> uint32_t {
   // Initialize the minimum count to the maximum possible value
-  uint32_t min_count = std::numeric_limits<uint32_t>::max();
+  uint32_t min_count = UINT32_MAX;
 
   for (size_t i = 0; i < depth_; i++) {
     // Get the hash function

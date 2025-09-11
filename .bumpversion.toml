@@ -30,5 +30,7 @@ replace = "version = \"{new_version}\""
 
 [[tool.bumpversion.files]]
 filename = "CMakeLists.txt"
-search = "project\\(\\s*([\\s\\S]*?)\\s+VERSION\\s+{current_version}([\\s\\S]*?)\\)"
-replace = "project(\\1 VERSION {new_version}\\2)"
+# Notice that I added the comment "# Project version" in the CMakeLists.txt 
+# to help the script find the version
+search = "VERSION {current_version} # Project version"
+replace = "VERSION {new_version} # Project version"

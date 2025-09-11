@@ -12,8 +12,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(DEVELOPMENT_MODE "Enable development mode with IDE support" OFF)
 option(BUILD_PYTHON_BINDINGS "Build Python bindings for development" OFF)
 
-# C++ standard
-set(CMAKE_CXX_STANDARD 23)
+# C++ standard - use C++17 for better compatibility
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -51,7 +51,7 @@ file(GLOB_RECURSE CMSKETCH_SOURCES "src/cmsketchcpp/*.cc")
 # Create library
 add_library(cmsketch ${CMSKETCH_SOURCES})
 target_include_directories(cmsketch PUBLIC include)
-target_compile_features(cmsketch PUBLIC cxx_std_23)
+target_compile_features(cmsketch PUBLIC cxx_std_17)
 
 # Example executable
 file(GLOB EXAMPLE_SOURCES "src/main.cc")

@@ -1,7 +1,7 @@
 #include "cmsketch/count_min_sketch.h"
 #include <algorithm>
 #include <cstddef>
-#include <format>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -20,9 +20,10 @@ CountMinSketch<KeyType>::CountMinSketch(uint32_t width, uint32_t depth)
 
   // Throw an error if width or depth are zero
   if (width == 0 || depth == 0) {
-    throw std::invalid_argument(std::format(
-        "Width and depth must be greater than zero; Got width: {}, depth: {}",
-        width, depth));
+    std::ostringstream oss;
+    oss << "Width and depth must be greater than zero; Got width: " 
+        << width << ", depth: " << depth;
+    throw std::invalid_argument(oss.str());
   }
 
   // Initialize the table with zeros

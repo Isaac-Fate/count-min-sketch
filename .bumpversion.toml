@@ -21,10 +21,10 @@ pre_commit_hooks = []
 post_commit_hooks = []
 
 [[tool.bumpversion.files]]
-filepath = "VERSION"
+filename = "VERSION"
 
 [[tool.bumpversion.files]]
-filepath = "pyproject.toml"
+filename = "pyproject.toml"
 search = "version = \"{current_version}\""
 replace = "version = \"{new_version}\""
 

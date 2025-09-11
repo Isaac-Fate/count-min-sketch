@@ -11,11 +11,9 @@ mkdir -p build
 cd build
 
 # Configure with CMake
-# For development/IDE support, add -DDEVELOPMENT_MODE=ON
 cmake .. \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_TESTS=ON \
-    -DBUILD_DOCS=OFF \
     -DBUILD_PYTHON_BINDINGS=ON
 
 # Build the project

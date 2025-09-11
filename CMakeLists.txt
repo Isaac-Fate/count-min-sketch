@@ -1,196 +1,99 @@
 cmake_minimum_required(VERSION 3.15)
 
-# Project configuration
 project(
   cmsketch
-  VERSION 1.0.0
-  DESCRIPTION "High-performance Count-Min Sketch implementation in C++"
+  VERSION 0.1.0
   LANGUAGES CXX)
 
-# Generate compile_commands.json for better IDE support
+# Generate compile_commands.json for IDE support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Development mode - ensures dependencies are found for IDE support
-option(DEVELOPMENT_MODE "Enable development mode with IDE dependency support"
-       OFF)
+# Build options
+option(DEVELOPMENT_MODE "Enable development mode with IDE support" OFF)
+option(BUILD_PYTHON_BINDINGS "Build Python bindings for development" OFF)
 
-# Set C++ standard
+# C++ standard
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Set default build type to Release if not specified
+# Default build type
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE
       Release
-      CACHE STRING "Choose the type of build." FORCE)
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-                                               "MinSizeRel" "RelWithDebInfo")
+      CACHE STRING "Build type" FORCE)
 endif()
 
-# Add compile definitions for better debugging
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  add_compile_definitions(DEBUG=1)
-else()
-  add_compile_definitions(NDEBUG=1)
-endif()
-
-# Compiler-specific options
+# Compiler warnings
 if(MSVC)
-  add_compile_options(/W4 /WX)
+  add_compile_options(/W4)
+  # Enable Windows symbol export
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 else()
-  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+  add_compile_options(-Wall -Wextra -Wpedantic)
+  # Enable position independent code for shared libraries
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-# Auto-detect source files
-file(GLOB_RECURSE CMSKETCH_SOURCES "src/cmsketchcpp/*.cc"
-     "src/cmsketchcpp/*.cpp")
+# Platform-specific settings
+if(APPLE)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET
+      "10.9"
+      CACHE STRING "Minimum OS X deployment version")
+  set(CMAKE_OSX_ARCHITECTURES
+      "x86_64;arm64"
+      CACHE STRING "Build architectures for OS X")
+endif()
 
-# Auto-detect header files
-file(GLOB_RECURSE CMSKETCH_HEADERS "include/cmsketch/*.h"
-     "include/cmsketch/*.hpp")
+# Source files
+file(GLOB_RECURSE CMSKETCH_SOURCES "src/cmsketchcpp/*.cc")
 
-# Create the main library
+# Create library
 add_library(cmsketch ${CMSKETCH_SOURCES})
-
-# Set target properties for better IDE support
-target_include_directories(
-  cmsketch PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                  $<INSTALL_INTERFACE:include>)
+target_include_directories(cmsketch PUBLIC include)
 target_compile_features(cmsketch PUBLIC cxx_std_23)
 
-# Auto-detect example source files
-file(GLOB EXAMPLE_SOURCES "src/main.cc" "src/main.cpp")
-
-# Create example executable
+# Example executable
+file(GLOB EXAMPLE_SOURCES "src/main.cc")
 add_executable(cmsketch_example ${EXAMPLE_SOURCES})
 target_link_libraries(cmsketch_example PRIVATE cmsketch)
 
-# Set target properties
-set_target_properties(
-  cmsketch
-  PROPERTIES VERSION ${PROJECT_VERSION}
-             SOVERSION ${PROJECT_VERSION_MAJOR}
-             PUBLIC_HEADER include/cmsketch/cmsketch.h)
-
 # Install targets
-install(
-  TARGETS cmsketch
-  EXPORT cmsketchTargets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  PUBLIC_HEADER DESTINATION include/cmsketch)
+install(TARGETS cmsketch DESTINATION lib)
+install(DIRECTORY include/ DESTINATION include)
 
-# Install headers
-install(
-  DIRECTORY include/cmsketch/
-  DESTINATION include/cmsketch
-  FILES_MATCHING
-  PATTERN "*.h")
-
-# Export targets (simplified - no complex package config needed)
-install(
-  EXPORT cmsketchTargets
-  FILE cmsketchTargets.cmake
-  NAMESPACE cmsketch::
-  DESTINATION lib/cmake/cmsketch)
-
-# Find pybind11 for Python bindings and IDE support
-if(DEVELOPMENT_MODE
+# Python bindings
+if(SKBUILD_PROJECT_NAME
    OR BUILD_PYTHON_BINDINGS
-   OR SKBUILD_PROJECT_NAME)
+   OR DEVELOPMENT_MODE)
   set(PYBIND11_FINDPYTHON ON)
-  find_package(pybind11 CONFIG QUIET)
-  if(NOT pybind11_FOUND)
-    find_package(pybind11 QUIET)
-  endif()
-endif()
-
-# Python bindings (only if building with scikit-build)
-if(SKBUILD_PROJECT_NAME AND pybind11_FOUND)
-  # Auto-detect Python bindings source
-  file(GLOB PYTHON_BINDINGS_SOURCES "src/python_bindings.cc"
-       "src/python_bindings.cpp")
-  pybind11_add_module(_core MODULE ${PYTHON_BINDINGS_SOURCES})
+  find_package(pybind11 REQUIRED)
+  pybind11_add_module(_core MODULE src/python_bindings.cc)
   target_link_libraries(_core PRIVATE cmsketch)
-  install(TARGETS _core DESTINATION ${SKBUILD_PROJECT_NAME})
-endif()
-
-# Python bindings for development/IDE support
-option(BUILD_PYTHON_BINDINGS "Build Python bindings for development" OFF)
-if((BUILD_PYTHON_BINDINGS OR DEVELOPMENT_MODE) AND pybind11_FOUND)
-  file(GLOB PYTHON_BINDINGS_SOURCES "src/python_bindings.cc"
-       "src/python_bindings.cpp")
-  pybind11_add_module(_core_dev MODULE ${PYTHON_BINDINGS_SOURCES})
-  target_link_libraries(_core_dev PRIVATE cmsketch)
-  set_target_properties(_core_dev PROPERTIES OUTPUT_NAME "_core")
-endif()
-
-# Testing - find GTest for IDE support in development mode
-option(BUILD_TESTS "Build tests" OFF)
-if(DEVELOPMENT_MODE OR BUILD_TESTS)
-  find_package(GTest QUIET)
-  if(GTest_FOUND)
-    enable_testing()
-    add_subdirectory(tests)
-  elseif(DEVELOPMENT_MODE)
-    message(
-      WARNING
-        "DEVELOPMENT_MODE enabled but GTest not found. Install GTest for test file IDE support."
-    )
+  if(SKBUILD_PROJECT_NAME)
+    install(TARGETS _core DESTINATION ${SKBUILD_PROJECT_NAME})
   endif()
 endif()
 
-# Documentation (only if enabled)
-option(BUILD_DOCS "Build documentation" OFF)
-if(BUILD_DOCS)
-  find_package(Doxygen REQUIRED)
-  add_subdirectory(docs)
+# Testing
+option(BUILD_TESTS "Build tests" OFF)
+if(BUILD_TESTS OR DEVELOPMENT_MODE)
+  find_package(GTest REQUIRED)
+  enable_testing()
+  add_subdirectory(tests)
 endif()
 
-# Add custom targets for common tasks
+# Custom targets
 add_custom_target(
   format
   COMMAND
     find ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/tests -name "*.cc" -o -name "*.h" | xargs clang-format
     -i
-  COMMENT "Formatting source code with clang-format"
+  COMMENT "Formatting source code"
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-add_custom_target(
-  clean-all
-  COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}
-  COMMENT "Removing all build files")
-
-# Print configuration summary
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
+# Status messages
 message(STATUS "Development mode: ${DEVELOPMENT_MODE}")
-message(STATUS "Build tests: ${BUILD_TESTS}")
 message(STATUS "Build Python bindings: ${BUILD_PYTHON_BINDINGS}")
-message(STATUS "pybind11 found: ${pybind11_FOUND}")
-if(GTest_FOUND)
-  message(STATUS "GTest found: ${GTest_FOUND}")
-endif()
-message(STATUS "Source files: ${CMSKETCH_SOURCES}")
-message(STATUS "Header files: ${CMSKETCH_HEADERS}")
-
-# Development mode info
-if(DEVELOPMENT_MODE)
-  message(STATUS "")
-  message(
-    STATUS "Development mode enabled - dependencies found for IDE support:")
-  if(pybind11_FOUND)
-    message(STATUS "  ✓ pybind11 - Python bindings headers available")
-  else()
-    message(STATUS "  ✗ pybind11 - Install with: pip install pybind11")
-  endif()
-  if(GTest_FOUND)
-    message(STATUS "  ✓ GTest - Test headers available")
-  else()
-    message(
-      STATUS "  ✗ GTest - Install via package manager for test file support")
-  endif()
-endif()
+message(STATUS "Build tests: ${BUILD_TESTS}")

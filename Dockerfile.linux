@@ -1,0 +1,21 @@
+# Dockerfile for building Linux wheels
+FROM quay.io/pypa/manylinux2014_x86_64
+
+# Install build dependencies
+RUN yum install -y cmake3 gcc-c++ make
+
+# Set up Python
+ENV PATH="/opt/python/cp311-cp311/bin:/opt/python/cp312-cp312/bin:$PATH"
+
+# Copy source code
+COPY . /src
+WORKDIR /src
+
+# Build wheels for multiple Python versions
+RUN for py in /opt/python/cp*/bin/python; do
+    $py -m pip install --upgrade pip build wheel scikit-build-core pybind11
+    $py -m build --wheel
+done
+
+# Output wheels
+CMD ["bash", "-c", "cp dist/*.whl /output/"]

@@ -22,11 +22,7 @@ cd build
 echo "Configuring with development mode enabled..."
 cmake .. \
     -DCMAKE_BUILD_TYPE=Debug \
-    -DDEVELOPMENT_MODE=ON \
-    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-    -DBUILD_TESTS=ON \
-    -DBUILD_DOCS=OFF \
-    -DBUILD_PYTHON_BINDINGS=ON
+    -DDEVELOPMENT_MODE=ON
 
 # Build the project
 echo "Building project..."
@@ -37,7 +33,7 @@ echo "Development build completed successfully!"
 echo ""
 echo "Development setup complete!"
 echo "- compile_commands.json generated for IDE support"
-echo "- Dependencies found and built for clangd/IDE header resolution"
+echo "- Python bindings and tests enabled for development"
 
 # Run tests if available
 if [ -f "tests/cmsketch_tests" ]; then

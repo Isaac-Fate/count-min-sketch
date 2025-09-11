@@ -39,7 +39,6 @@ CountMinSketch<KeyType>::CountMinSketch(uint32_t width, uint32_t depth)
 template <typename KeyType>
 CountMinSketch<KeyType>::CountMinSketch(CountMinSketch &&other) noexcept
     : width_(other.width_), depth_(other.depth_) {
-
   // Do nothing if the other sketch is the same
   if (this == &other) {
     return;
@@ -91,7 +90,6 @@ void CountMinSketch<KeyType>::Merge(const CountMinSketch<KeyType> &other) {
     throw std::invalid_argument(
         "Incompatible CountMinSketch dimensions for merge.");
   }
-  /** @TODO(student) Implement this function! */
 
   for (size_t i = 0; i < width_ * depth_; i++) {
     // Get the count in the cell of the other sketch
@@ -128,8 +126,6 @@ auto CountMinSketch<KeyType>::Count(const KeyType &item) const -> uint32_t {
 }
 
 template <typename KeyType> void CountMinSketch<KeyType>::Clear() {
-  /** @TODO(student) Implement this function! */
-
   // Zero out the sketch matrix
   std::fill(sketch_matrix_->begin(), sketch_matrix_->end(), 0);
 }
@@ -138,8 +134,6 @@ template <typename KeyType>
 auto CountMinSketch<KeyType>::TopK(uint16_t k,
                                    const std::vector<KeyType> &candidates)
     -> std::vector<std::pair<KeyType, uint32_t>> {
-  /** @TODO(student) Implement this function! */
-
   // Calculate counts of all candidates
   size_t n = candidates.size();
   std::vector<std::pair<KeyType, uint32_t>> counts(n);

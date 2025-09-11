@@ -28,7 +28,7 @@ filename = "pyproject.toml"
 search = "version = \"{current_version}\""
 replace = "version = \"{new_version}\""
 
-# [[tool.bumpversion.files]]
-# filepath = "CMakeLists.txt"
-# search = "project\\(\\s*([\\s\\S]*?)\\s+VERSION\\s+{current_version}([\\s\\S]*?)\\)"
-# replace = "project(\\1 VERSION {new_version}\\2)"
+[[tool.bumpversion.files]]
+filename = "CMakeLists.txt"
+search = "project\\(\\s*([\\s\\S]*?)\\s+VERSION\\s+{current_version}([\\s\\S]*?)\\)"
+replace = "project(\\1 VERSION {new_version}\\2)"

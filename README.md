@@ -403,6 +403,31 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
+#### Version Management
+The project includes automated version bumping with multiple options:
+
+**Option 1: Manual Version Bump (Recommended)**
+```bash
+# Use the interactive script
+./scripts/bump-version.sh
+
+# Or use bump2version directly
+bump2version patch  # 0.1.0 → 0.1.1
+bump2version minor  # 0.1.0 → 0.2.0
+bump2version major  # 0.1.0 → 1.0.0
+```
+
+**Option 2: GitHub Actions Workflow**
+- Go to Actions → "Bump Version" → Run workflow
+- Choose version type (patch/minor/major)
+- Optionally enable dry-run mode
+
+**Option 3: Automatic Based on Commit Messages**
+- `feat:` or `feature:` → minor version bump
+- `fix:` or `bugfix:` → patch version bump
+- `BREAKING CHANGE:` → major version bump
+- `chore:`, `docs:`, `style:`, etc. → patch version bump
+
 #### Local Development
 For local development on your current platform:
 

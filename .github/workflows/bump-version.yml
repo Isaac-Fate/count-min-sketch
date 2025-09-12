@@ -25,6 +25,7 @@ jobs:
         uses: callowayproject/bump-my-version@master
         env:
           BUMPVERSION_TAG: "true"
+          BUMPVERSION_COMMIT: "true"
         with:
           args: ${{ inputs.bump-type }}
 
@@ -32,3 +33,4 @@ jobs:
         if: steps.bump.outputs.bumped == 'true'
         run: |
           echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
+      

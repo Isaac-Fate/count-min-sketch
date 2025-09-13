@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core>=0.10", "pybind11"]
+requires = ["scikit-build-core>=0.10", "pybind11", "cmake>=3.15"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -54,12 +54,11 @@ args = [
 
 [tool.cibuildwheel]
 build = "cp311-* cp312-*"
-skip = "*-win32 *-manylinux_i686"
+skip = "*-win32 *-manylinux_i686 *-musllinux*"
 test-command = "python -m pytest {project}/pytests -v"
 test-requires = "pytest"
+manylinux-x86_64-image = "manylinux_2_28"
 
-[tool.cibuildwheel.linux]
-before-all = "yum install -y cmake gcc-c++ || apt-get update && apt-get install -y cmake build-essential"
 
 [tool.cibuildwheel.macos]
 environment = { MACOSX_DEPLOYMENT_TARGET = "10.15" }

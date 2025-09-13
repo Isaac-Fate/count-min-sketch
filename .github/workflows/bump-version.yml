@@ -1,10 +1,10 @@
-name: Bump version
+name: Bump Version and Release
 
 on:
   workflow_dispatch:
     inputs:
       bump-type:
-        description: 'Bump type'
+        description: 'Version bump type'
         required: true
         default: 'patch'
         type: choice
@@ -12,25 +12,77 @@ on:
         - major
         - minor
         - patch
+      dry-run:
+        description: 'Dry run (do not commit/tag)'
+        type: boolean
+        default: false
 
 jobs:
-  build:
+  bump-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # For creating commits and tags
+    
     steps:
-      - name: Checkout the code
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for proper version calculation
+        token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Bump version
-        id: bump
-        uses: callowayproject/bump-my-version@master
-        env:
-          BUMPVERSION_TAG: "true"
-          BUMPVERSION_COMMIT: "true"
-        with:
-          args: ${{ inputs.bump-type }}
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
 
-      - name: Check
-        if: steps.bump.outputs.bumped == 'true'
-        run: |
-          echo "Version was bumped from ${{ steps.bump.outputs.previous-version }} to ${{ steps.bump.outputs.current-version }}!"
-      
+    - name: Get current version
+      id: current
+      run: |
+        version=$(cat VERSION 2>/dev/null || echo "0.0.0")
+        echo "version=$version" >> $GITHUB_OUTPUT
+        echo "Current version: $version"
+
+    - name: Dry run version bump
+      if: inputs.dry-run
+      run: |
+        echo "DRY RUN MODE - No changes will be made"
+        echo "Would bump ${{ inputs.bump-type }} version from ${{ steps.current.outputs.version }}"
+
+    - name: Bump version
+      if: "!inputs.dry-run"
+      id: bump
+      uses: callowayproject/bump-my-version@master
+      env:
+        BUMPVERSION_TAG: "true"
+        BUMPVERSION_COMMIT: "true" 
+      with:
+        args: ${{ inputs.bump-type }}
+
+    - name: Get new version
+      if: "!inputs.dry-run"
+      id: new
+      run: |
+        version=$(cat VERSION)
+        echo "version=$version" >> $GITHUB_OUTPUT
+        echo "New version: $version"
+
+    - name: Push changes
+      if: "!inputs.dry-run"
+      run: |
+        git push origin main --tags
+        echo "Pushed version bump and tag to repository"
+
+    - name: Summary
+      run: |
+        if [ "${{ inputs.dry-run }}" = "true" ]; then
+          echo "## Dry Run Summary" >> $GITHUB_STEP_SUMMARY
+          echo "Would bump **${{ inputs.bump-type }}** version from **${{ steps.current.outputs.version }}**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "## Version Bump Summary" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Successfully bumped **${{ inputs.bump-type }}** version" >> $GITHUB_STEP_SUMMARY
+          echo "- Previous: **${{ steps.current.outputs.version }}**" >> $GITHUB_STEP_SUMMARY
+          echo "- New: **${{ steps.new.outputs.version }}**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🏗️ This will trigger the build workflow automatically" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Wheels will be built and uploaded to PyPI" >> $GITHUB_STEP_SUMMARY
+        fi

@@ -20,14 +20,17 @@ setup_hooks = []
 pre_commit_hooks = []
 post_commit_hooks = []
 
+# VERSION file
 [[tool.bumpversion.files]]
 filename = "VERSION"
 
+# Python project configuration
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
 search = "version = \"{current_version}\""
 replace = "version = \"{new_version}\""
 
+# C++ CMakeLists
 [[tool.bumpversion.files]]
 filename = "CMakeLists.txt"
 # Notice that I added the comment "# Project version" in the CMakeLists.txt 

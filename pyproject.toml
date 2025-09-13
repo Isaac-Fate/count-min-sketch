@@ -7,7 +7,7 @@ name = "cmsketch"
 version = "0.1.9"
 description = "High-performance Count-Min Sketch implementation with C++ and Python versions"
 readme = "README.md"
-license = { text = "MIT" }
+license = { file = "LICENSE" }
 authors = [{ name = "isaac-fei", email = "isaac.omega.fei@gmail.com" }]
 maintainers = [{ name = "isaac-fei", email = "isaac.omega.fei@gmail.com" }]
 requires-python = ">=3.11"
@@ -23,19 +23,13 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Operating System :: OS Independent",
 ]
-keywords = [
-    "count-min-sketch",
-    "probabilistic",
-    "data-structure",
-    "streaming",
-    "big-data",
-]
+keywords = ["count-min-sketch", "probabilistic", "data-structure", "streaming"]
 
 [project.urls]
-Homepage = "https://github.com/isaac-fei/count-min-sketch"
-Repository = "https://github.com/isaac-fei/count-min-sketch"
-Documentation = "https://github.com/isaac-fei/count-min-sketch#readme"
-Issues = "https://github.com/isaac-fei/count-min-sketch/issues"
+Homepage = "https://github.com/isaac-fate/count-min-sketch"
+Repository = "https://github.com/isaac-fate/count-min-sketch"
+Documentation = "https://github.com/isaac-fate/count-min-sketch#readme"
+Issues = "https://github.com/isaac-fate/count-min-sketch/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0", "pytest-benchmark>=4.0.0", "build>=1.0.0"]

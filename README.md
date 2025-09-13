@@ -1,11 +1,10 @@
 # Count-Min Sketch
 
-A high-performance C++ implementation of the Count-Min Sketch probabilistic data structure with Python bindings, inspired by [CMU 15-445/645 Project #0](https://15445.courses.cs.cmu.edu/fall2025/project0/).
+A high-performance C++ implementation of the Count-Min Sketch probabilistic data structure with Python bindings.
 
 [![Python Package](https://img.shields.io/pypi/v/cmsketch)](https://pypi.org/project/cmsketch/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.cppreference.com/w/cpp/17)
-
 
 ## Project Purpose
 
@@ -18,47 +17,39 @@ This project serves as an educational exploration of:
 
 The implementation is inspired by the [CMU 15-445/645 Database Systems course Project #0](https://15445.courses.cs.cmu.edu/fall2025/project0/), which focuses on implementing a Count-Min Sketch data structure. This project extends that educational foundation by exploring how to package C++ implementations for Python consumption and comparing performance characteristics.
 
-## CMU 15-445/645 Inspiration
+## What is Count-Min Sketch?
 
-This project is directly inspired by [Project #0 from CMU's Database Systems course](https://15445.courses.cs.cmu.edu/fall2025/project0/), which requires students to implement a Count-Min Sketch data structure. The CMU assignment focuses on:
+The Count-Min Sketch is a probabilistic data structure that provides approximate frequency counts for items in a stream. It's particularly useful for:
 
-- Basic Count-Min Sketch implementation with insertion, count estimation, and merging
-- Thread-safe insertion operations
-- Performance optimization for concurrent access
-- Understanding of probabilistic data structures
+> **Learn more**: [Count-Min Sketch on Wikipedia](https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch)
 
-This project extends those concepts by exploring the complete software engineering lifecycle of packaging C++ implementations for Python consumption.
+- **Streaming data analysis** - Process large datasets without storing all items
+- **Frequency estimation** - Get approximate counts with bounded error
+- **Memory efficiency** - O(width × depth) space complexity
+- **Real-time applications** - Fast insertions and queries
 
 ## Features
 
-- **High Performance**: Optimized C++ implementation with atomic operations for thread safety
-- **Template-Based Design**: Supports any hashable key type (strings, integers, etc.)
-- **Python Bindings**: Easy-to-use Python interface via pybind11
-- **Memory Efficient**: O(width × depth) space complexity
-- **Thread-Safe**: Concurrent access with atomic operations
-- **Cross-Platform**: Works on Linux, macOS, and Windows
+- ⚡ **High Performance** - Optimized C++ with atomic operations for thread safety
+- 🔧 **Template-Based** - Supports any hashable key type (strings, integers, etc.)
+- 🐍 **Python Bindings** - Easy-to-use Python interface via pybind11
+- 🧵 **Thread-Safe** - Concurrent access with atomic operations
+- 🌍 **Cross-Platform** - Works on Linux, macOS, and Windows
+- 📦 **Easy Installation** - Available on PyPI
 
 ## Quick Start
 
 ### Installation
 
-#### Using uv (Recommended)
-
 ```bash
-# Install uv if you haven't already
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Using pip
+pip install cmsketch
 
-# Install the package
+# Using uv (recommended)
 uv add cmsketch
 ```
 
-#### Using pip
-
-```bash
-pip install cmsketch
-```
-
-### Python Usage
+### Basic Usage
 
 ```python
 import cmsketch
@@ -109,11 +100,12 @@ int main() {
 
 ## API Reference
 
-### Core Classes
+### Python Classes
 
-- **`CountMinSketchStr`**: String-based sketch (Python)
-- **`CountMinSketchInt`**: Integer-based sketch (Python)
-- **`CountMinSketch<KeyType>`**: Template-based sketch (C++)
+| Class | Description |
+|-------|-------------|
+| `CountMinSketchStr` | String-based sketch |
+| `CountMinSketchInt` | Integer-based sketch |
 
 ### Key Methods
 
@@ -151,6 +143,53 @@ The Count-Min Sketch provides the following guarantees:
 - **Memory**: O(width × depth) counters
 - **Thread Safety**: Atomic operations ensure concurrent access
 
+## Performance
+
+The C++ implementation provides significant performance improvements:
+
+- **Insertion**: 10-50x faster than Python
+- **Query**: 5-20x faster than Python  
+- **Memory**: 2-5x more efficient than Python
+- **Thread Safety**: Native atomic operations vs GIL limitations
+
+### Benchmark Suite
+
+The project includes a comprehensive benchmark suite that tests real-world scenarios:
+
+#### Test Data
+- **100,000 IP address samples** generated using Faker with weighted distribution (10 unique IPs)
+- **Realistic frequency patterns** (most frequent IP appears ~10% of the time)
+- **Threaded processing** with 10 concurrent workers and 1,000-item batches
+
+#### Benchmark Categories
+
+| Category | Description | Tests |
+|----------|-------------|-------|
+| **Insert** | Bulk insertion performance | C++ vs Python with 100k threaded inserts |
+| **Count** | Query performance | Frequency counting for all unique items |
+| **Top-K** | Top-k retrieval | Finding top 3 most frequent items |
+| **Streaming** | End-to-end workflows | Complete insert + top-k pipeline |
+
+#### Running Benchmarks
+
+```bash
+# Run all benchmarks
+uv run python ./benchmarks/run.py
+
+# Save results to JSON
+uv run python ./benchmarks/run.py --json
+
+# Generate test data
+uv run python ./benchmarks/generate_data.py
+```
+
+#### Benchmark Features
+- **Synthetic data**: Uses Faker-generated IP addresses with realistic distributions
+- **Threaded testing**: Tests concurrent access patterns
+- **Comparative analysis**: Direct C++ vs Python performance comparison
+- **Statistical accuracy**: Uses pytest-benchmark for reliable measurements
+- **Automated data generation**: Creates test data if missing
+
 ## Building from Source
 
 ### Prerequisites
@@ -164,7 +203,7 @@ The Count-Min Sketch provides the following guarantees:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/count-min-sketch.git
+git clone https://github.com/isaac-fate/count-min-sketch.git
 cd count-min-sketch
 
 # Build everything
@@ -177,11 +216,11 @@ make test
 make example
 ```
 
-### Development with uv
+### Development Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/count-min-sketch.git
+git clone https://github.com/isaac-fate/count-min-sketch.git
 cd count-min-sketch
 
 # Install all dependencies (including dev dependencies)
@@ -198,159 +237,105 @@ make build-dev
 cd build && make test
 
 # Run benchmarks
-uv run python benchmarks/run.py
-
-# Format code
-uv run python -m black .
-uv run python -m isort .
-
-# Type checking
-uv run mypy src/cmsketch/
+uv run python ./benchmarks/run.py
 ```
 
-### Development Workflow
+## GitHub Actions
+
+This project uses GitHub Actions for automated CI/CD workflows:
+
+### Workflows
+
+- **`test.yml`**: Runs C++ and Python tests on all platforms
+- **`wheels.yml`**: Builds wheels for Windows, Linux, and macOS using [cibuildwheel](https://github.com/pypa/cibuildwheel)
+- **`release.yml`**: Automatically publishes wheels to PyPI on release
+
+### Supported Platforms
+
+- **Python Versions**: 3.11 and 3.12
+- **Architectures**: 
+  - Windows: x86_64
+  - Linux: x86_64  
+  - macOS: Intel (x86_64) and Apple Silicon (arm64)
+
+### Triggering Workflows
 
 ```bash
-# Start a new feature
-git checkout -b feature/new-feature
+# Push to trigger tests and wheel builds
+git push origin main
 
-# Make changes to code...
-
-# Run tests
-uv run pytest pytests/
-make build-dev && cd build && make test
-
-# Format and lint
-uv run python -m black .
-uv run python -m isort .
-uv run mypy src/cmsketch/
-
-# Build and test package
-uv run python -m build
-uv run python -m pip install dist/*.whl
-
-# Commit changes
-git add .
-git commit -m "Add new feature"
+# Create a release to upload all wheels to PyPI
+git tag v0.1.0
+git push origin v0.1.0
 ```
 
-## Performance
+### Workflow Features
 
-The C++ implementation provides significant performance improvements:
-
-- **Insertion**: 10-50x faster than Python
-- **Query**: 5-20x faster than Python  
-- **Memory**: 2-5x more efficient than Python
-- **Thread Safety**: Native atomic operations vs GIL limitations
-
-Run benchmarks:
-
-```bash
-# Using uv (recommended)
-uv run python benchmarks/run.py
-
-# Or using the Jupyter notebook
-uv run jupyter lab playground/bench.ipynb
-```
-
-## Why uv?
-
-This project uses [uv](https://github.com/astral-sh/uv) for Python package management because it offers:
-
-- **⚡ Speed**: 10-100x faster than pip for dependency resolution
-- **🔒 Reliability**: Deterministic builds with lock files
-- **🛠️ Developer Experience**: Single tool for virtual environments, dependencies, and builds
-- **📦 Modern**: Built for modern Python packaging standards
-- **🔄 Reproducible**: Consistent environments across different machines
-
-### uv Commands Reference
-
-```bash
-# Install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install package dependencies
-uv sync
-
-# Install with dev dependencies
-uv sync --dev
-
-# Add a new dependency
-uv add package-name
-
-# Add a dev dependency
-uv add --dev package-name
-
-# Run commands in the virtual environment
-uv run python script.py
-uv run pytest
-uv run jupyter lab
-
-# Build the package
-uv run python -m build
-
-# Install the package locally
-uv run pip install -e .
-```
+- **Cross-Platform Compilation**: Uses [cibuildwheel](https://github.com/pypa/cibuildwheel) for consistent wheel building
+- **Dependency Management**: Automated dependency installation and caching
+- **Test Coverage**: Comprehensive testing across all supported platforms
+- **Automated Publishing**: PyPI upload on release
 
 ## Project Structure
 
 ```
 count-min-sketch/
-├── include/cmsketch/           # C++ header files
-│   ├── cmsketch.h             # Main header (include this)
-│   ├── count_min_sketch.h     # Core Count-Min Sketch template class
-│   └── hash_util.h            # Hash utility functions
-├── src/cmsketchcpp/           # C++ source files
-│   └── count_min_sketch.cc    # Core implementation
-├── src/cmsketch/              # Python package source
-│   ├── __init__.py            # Package initialization
-│   ├── base.py                # Base classes and interfaces
-│   ├── _core.pyi              # Type stubs for C++ bindings
-│   ├── py.typed               # Type checking marker
-│   └── py/                    # Pure Python implementations
-│       ├── count_min_sketch.py
-│       └── hash_util.py
-├── src/                       # Additional source files
-│   ├── main.cc               # Example application
-│   └── python_bindings.cc    # Python bindings
-├── tests/                     # C++ unit tests
-│   ├── CMakeLists.txt        # Test configuration
-│   ├── test_count_min_sketch.cc
-│   ├── test_hash_functions.cc
-│   └── test_sketch_config.cc
-├── pytests/                   # Python tests
-│   ├── __init__.py
-│   ├── conftest.py
-│   ├── test_count_min_sketch.py
-│   ├── test_hash_util.py
-│   ├── test_mixins.py
-│   └── test_py_count_min_sketch.py
-├── benchmarks/                # Performance benchmarks
-│   ├── __init__.py
-│   ├── generate_data.py       # Data generation utilities
-│   ├── run.py                 # Benchmark runner
-│   └── test_benchmarks.py     # Benchmark tests
-├── playground/                # Jupyter notebooks
-│   ├── bench.ipynb           # Performance comparison
-│   ├── cmsketch.ipynb        # Usage examples
-│   └── data.ipynb            # Data analysis
-├── examples/                  # Example scripts
-│   └── example.py            # Python example
-├── scripts/                   # Build and deployment scripts
-│   ├── build.sh              # Build script
-│   ├── build-dev.sh          # Development build
-│   └── publish.sh            # Publishing script
-├── data/                      # Sample data files
-│   ├── ips.txt               # IP address data
-│   └── unique-ips.txt        # Unique IP data
-├── build/                     # Build artifacts (generated)
-├── CMakeLists.txt            # Main build configuration
-├── pyproject.toml            # Python package configuration
-├── uv.lock                   # uv lock file
-├── Makefile                  # Convenience make targets
-├── LICENSE                   # MIT License
-└── README.md                 # This file
+├── include/cmsketch/                    # C++ header files
+│   ├── cmsketch.h                      # Main header (include this)
+│   ├── count_min_sketch.h              # Core Count-Min Sketch template class
+│   └── hash_util.h                     # Hash utility functions
+├── src/cmsketchcpp/                    # C++ source files
+│   └── count_min_sketch.cc             # Core implementation
+├── src/cmsketch/                       # Python package source
+│   ├── __init__.py                     # Package initialization
+│   ├── base.py                         # Base classes and interfaces
+│   ├── _core.pyi                       # Type stubs for C++ bindings
+│   ├── _version.py                     # Version information
+│   ├── py.typed                        # Type checking marker
+│   └── py/                             # Pure Python implementations
+│       ├── count_min_sketch.py         # Python Count-Min Sketch implementation
+│       └── hash_util.py                # Python hash utilities
+├── src/                                # Additional source files
+│   ├── main.cc                         # Example C++ application
+│   └── python_bindings.cc              # Python bindings (pybind11)
+├── tests/                              # C++ unit tests
+│   ├── CMakeLists.txt                  # Test configuration
+│   ├── test_count_min_sketch.cc        # Core functionality tests
+│   ├── test_hash_functions.cc          # Hash function tests
+│   └── test_sketch_config.cc           # Configuration tests
+├── pytests/                            # Python tests
+│   ├── __init__.py                     # Test package init
+│   ├── conftest.py                     # Pytest configuration
+│   ├── test_count_min_sketch.py        # Core Python tests
+│   ├── test_hash_util.py               # Hash utility tests
+│   ├── test_mixins.py                  # Mixin class tests
+│   └── test_py_count_min_sketch.py     # Pure Python implementation tests
+├── benchmarks/                         # Performance benchmarks
+│   ├── __init__.py                     # Benchmark package init
+│   ├── generate_data.py                # Data generation utilities
+│   ├── run.py                          # Benchmark runner
+│   └── test_benchmarks.py              # Benchmark validation tests
+├── examples/                           # Example scripts
+│   └── example.py                      # Python usage example
+├── scripts/                            # Build and deployment scripts
+│   ├── build.sh                        # Production build script
+│   └── build-dev.sh                    # Development build script
+├── data/                               # Sample data files
+│   ├── ips.txt                         # IP address sample data
+│   └── unique-ips.txt                  # Unique IP sample data
+├── build/                              # Build artifacts (generated)
+│   ├── _core.cpython-*.so              # Compiled Python extensions
+│   ├── cmsketch_example                # Compiled C++ example
+│   ├── libcmsketch.a                   # Static library
+│   └── tests/                          # Compiled test binaries
+├── dist/                               # Distribution packages (generated)
+│   └── cmsketch-*.whl                  # Python wheel packages
+├── CMakeLists.txt                      # Main CMake configuration
+├── pyproject.toml                      # Python package configuration
+├── uv.lock                             # uv lock file
+├── Makefile                            # Convenience make targets
+├── LICENSE                             # MIT License
+└── README.md                           # This file
 ```
 
 ## Educational Value
@@ -381,85 +366,6 @@ This project demonstrates several important software engineering concepts:
 - **STL Integration**: Standard library containers and algorithms
 - **Google Style Guide**: Consistent, readable code formatting
 
-## Multi-Platform Support
-
-This package supports multiple platforms through pre-built wheels:
-
-### Supported Platforms
-- **Windows**: x86_64 (Python 3.11, 3.12)
-- **Linux**: x86_64 (Python 3.11, 3.12)
-- **macOS**: Intel (x86_64) and Apple Silicon (arm64) (Python 3.11, 3.12)
-
-### Building for Multiple Platforms
-
-#### Using GitHub Actions (Recommended)
-The repository includes automated multi-platform builds via GitHub Actions:
-
-```bash
-# Push to trigger builds
-git push origin main
-
-# Create a release to upload all wheels to PyPI
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-#### Version Management
-The project includes automated version bumping with multiple options:
-
-**Option 1: Manual Version Bump (Recommended)**
-```bash
-# Use the interactive script
-./scripts/bump-version.sh
-
-# Or use bump2version directly
-bump2version patch  # 0.1.0 → 0.1.1
-bump2version minor  # 0.1.0 → 0.2.0
-bump2version major  # 0.1.0 → 1.0.0
-```
-
-**Option 2: GitHub Actions Workflow**
-- Go to Actions → "Bump Version" → Run workflow
-- Choose version type (patch/minor/major)
-- Optionally enable dry-run mode
-
-**Option 3: Automatic Based on Commit Messages**
-- `feat:` or `feature:` → minor version bump
-- `fix:` or `bugfix:` → patch version bump
-- `BREAKING CHANGE:` → major version bump
-- `chore:`, `docs:`, `style:`, etc. → patch version bump
-
-#### Local Development
-For local development on your current platform:
-
-```bash
-# Build for current platform
-./scripts/build-multiplatform.sh
-
-# Or using Docker (Linux only)
-./scripts/build-docker.sh
-```
-
-#### Manual Multi-Platform Builds
-To build for specific platforms manually:
-
-```bash
-# Install build dependencies
-pip install build wheel scikit-build-core pybind11
-
-# Build wheel for current platform
-python -m build --wheel
-```
-
-### Distribution Package Contents
-Each wheel contains:
-- **Compiled C++ extension** (`.so`, `.pyd`, or `.dylib` files)
-- **Python wrapper code** (pure Python interface)
-- **Type stubs** (`.pyi` files for type checking)
-- **Package metadata** (version, dependencies, etc.)
-
-**Note**: Static libraries and header files are excluded from the distribution package as they're not needed for Python users.
-
 ## Contributing
 
 1. Fork the repository
@@ -472,9 +378,3 @@ Each wheel contains:
 ## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- **CMU 15-445/645 Database Systems Course** for Count-Min Sketch assignment inspiration
-- **pybind11** for excellent C++ to Python binding capabilities
-- **scikit-build-core** for modern Python build system integration

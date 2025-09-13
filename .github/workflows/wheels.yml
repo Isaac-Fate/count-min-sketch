@@ -1,0 +1,75 @@
+name: Wheels
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+    - v*
+  release:
+    types:
+    - published
+
+concurrency:
+  group: wheels-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build_wheels:
+    name: Build wheel for ${{ matrix.python }}-${{ matrix.buildplat[1] }}
+    runs-on: ${{ matrix.buildplat[0] }}
+    strategy:
+      fail-fast: false
+      matrix:
+        buildplat:
+        - [ubuntu-latest, manylinux_x86_64]
+        - [ubuntu-latest, musllinux_x86_64]
+        - [macos-13, macosx_x86_64]
+        - [macos-14, macosx_arm64]  
+        - [windows-latest, win_amd64]
+        python: [cp311, cp312]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.21
+      env:
+        CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: cibw-wheels-${{ matrix.python }}-${{ matrix.buildplat[1] }}
+        path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build sdist
+      run: pipx run build --sdist
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: cibw-sdist
+        path: dist/*.tar.gz
+
+  upload_pypi:
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    environment:
+      name: pypi
+      url: https://pypi.org/p/cmsketch
+    permissions:
+      id-token: write
+
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: cibw-*
+        path: dist
+        merge-multiple: true
+
+    - uses: pypa/gh-action-pypi-publish@release/v1

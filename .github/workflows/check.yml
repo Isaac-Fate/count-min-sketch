@@ -1,0 +1,30 @@
+name: Check
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: '0 12 * * 1'  # Weekly on Monday
+
+jobs:
+  check:
+    name: Check links and dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Check for outdated dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e .[dev]
+        python -m pip list --outdated
+
+    - name: Security check
+      run: |
+        python -m pip install safety
+        python -m safety check --json || true

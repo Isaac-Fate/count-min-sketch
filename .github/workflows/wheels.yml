@@ -10,9 +10,6 @@ on:
   push:
     tags:
     - v*
-  release:
-    types:
-    - published
 
 concurrency:
   group: wheels-${{ github.head_ref || github.run_id }}
@@ -62,7 +59,7 @@ jobs:
   upload_pypi:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    if: (github.event_name == 'release' && github.event.action == 'published') || (github.event_name == 'workflow_dispatch' && inputs.upload_to_pypi)
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.upload_to_pypi)
     environment:
       name: pypi
       url: https://pypi.org/p/cmsketch
@@ -78,4 +75,4 @@ jobs:
 
     - uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        password: ${{ secrets.PYPI_API_TOKEN }}
+        token: ${{ secrets.PYPI_API_TOKEN }}

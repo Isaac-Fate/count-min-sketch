@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "cmsketch"
-version = "0.1.1"
+version = "0.1.2"
 description = "High-performance Count-Min Sketch implementation with C++ and Python versions"
 readme = "README.md"
 license = { text = "MIT" }

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 
 project(
   cmsketch
-  VERSION 0.1.10 # Project version
+  VERSION 0.1.11 # Project version
   LANGUAGES CXX)
 
 # Generate compile_commands.json for IDE support
